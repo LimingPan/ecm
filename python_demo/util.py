@@ -2,6 +2,8 @@ import pandas as pd
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 
+from python_demo.common import data_check2, data_check1
+
 
 def get_matrisome_data():
     # Enable conversion between pandas and R data frames
@@ -25,13 +27,7 @@ def get_matrisome_data():
 
 
 def matriannotate(data=None, gene_column=None, species=None):
-    if data is None:
-        print("no data provided, execution stops")
-        return
-
-    if not isinstance(data, pd.DataFrame):
-        print("data should be in data.frame format, execution stops")
-        return
+    data_check1(data)
 
     if gene_column is None:
         print("a column indicating gene IDs must be provided, execution stops")
@@ -97,19 +93,9 @@ def matriannotate(data=None, gene_column=None, species=None):
 
 
 def matrianalyze(data=None):
-    if data is None:
-        print("no data provided, execution stops")
-        return
-
-    if not isinstance(data, pd.DataFrame):
-        print("data should be in data.frame format, execution stops")
-        return
+    data_check2(data)
 
     if len(data.columns) < 1:
-        print("data should be annotated first, execution stops")
-        return
-
-    if 'workflow' not in data.attrs or data.attrs['workflow'] != "matrisomeannotatoR":
         print("data should be annotated first, execution stops")
         return
 

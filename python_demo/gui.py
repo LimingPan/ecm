@@ -2,36 +2,24 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from python_demo.common import data_check2
 
-def matri_bar(data=None, print_plot=True):
-    if data is None:
-        print("no data provided, execution stops")
-        return
 
-    if not isinstance(data, pd.DataFrame):
-        print("data should be in data.frame format, execution stops")
-        return
+def create_color_map(unique_values, default_color="#D9D9D9"):
+    """
+    Create a color map from unique values based on a base color map.
 
-    if 'workflow' not in data.attrs or data.attrs['workflow'] != "matrisomeannotatoR":
-        print("graphs can only be drawn for annotated files, execution stops")
-        return
+    Parameters:
+    - unique_values: List of unique values in the data
+    - base_colors: Dictionary with predefined color mappings
+    - default_color: Default color if a value is not in base_colors
 
-    gdf = data.copy()
+    Returns:
+    - color_map: Dictionary mapping unique values to colors
+    """
+    color_map = {}
 
-    # Create data frames for counts
-    v1 = gdf['Annotated Matrisome Division'].value_counts().reset_index()
-    v1.columns = ['Var1', 'Freq']
-    v1['source'] = "Annotated Matrisome Division"
-
-    v2 = gdf['Annotated Matrisome Category'].value_counts().reset_index()
-    v2.columns = ['Var1', 'Freq']
-    v2['source'] = "Annotated Matrisome Category"
-
-    # Combine data
-    d1 = pd.concat([v1, v2])
-
-    # Define color mapping for 'Var1'
-    color_map = {
+    base_colors = {
         "Drosophila matrisome": "#B118DB",
         "Nematode-specific core matrisome": "#B118DB",
         "Nematode-specific matrisome-associated": "#741B47",
@@ -50,8 +38,35 @@ def matri_bar(data=None, print_plot=True):
         "Non-matrisome": "#D9D9D9"
     }
 
-    # Map colors to Var1 values
-    d1['color'] = d1['Var1'].map(color_map).fillna('#D9D9D9')  # Default color if not in color_map
+    for i, value in enumerate(unique_values):
+        # Generate a color if not in base_colors
+        if value in base_colors:
+            color_map[value] = base_colors[value]
+        else:
+            color_map[value] = plt.cm.tab20.colors[i % len(plt.cm.tab20.colors)]
+    return color_map
+
+
+def matri_bar(data=None, print_plot=True):
+    data_check2(data)
+
+    gdf = data.copy()
+
+    # Create data frames for counts
+    v1 = gdf['Annotated Matrisome Division'].value_counts().reset_index()
+    v1.columns = ['Var1', 'Freq']
+    v1['source'] = "Annotated Matrisome Division"
+
+    v2 = gdf['Annotated Matrisome Category'].value_counts().reset_index()
+    v2.columns = ['Var1', 'Freq']
+    v2['source'] = "Annotated Matrisome Category"
+
+    # Combine data
+    d1 = pd.concat([v1, v2])
+
+    # Generate color map based on data
+    unique_values = d1['Var1'].unique()
+    color_map = create_color_map(unique_values)
 
     # Plot for each source on a separate figure
     sources = d1['source'].unique()
