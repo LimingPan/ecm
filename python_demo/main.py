@@ -1,6 +1,7 @@
 import pandas as pd
 
 from python_demo.gui import matri_bar, matri_flow, matri_ring
+# from python_demo.gui_star import matri_star
 from python_demo.util import matriannotate, matrianalyze
 
 
@@ -10,9 +11,10 @@ def run():
     # 'human'    'mouse'    'c.elegans'    'zebrafish'    'drosophila'
     ann = matriannotate(data=data, gene_column="Gene Symbol", species="human")
     tbl = matrianalyze(ann)
-    # matri_bar(ann)
-    # matri_flow(ann)
+    matri_bar(ann)
+    matri_flow(ann)
     matri_ring(ann)
+    # matri_star(ann)
 
 if __name__ == '__main__':
     run()
